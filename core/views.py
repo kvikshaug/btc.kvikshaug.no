@@ -1,4 +1,9 @@
 from django.shortcuts import render
 
+from core import price
+
 def index(request):
-    return render(request, 'core/index.html')
+    context = {
+        'price': price.get_current(),
+    }
+    return render(request, 'core/index.html', context)

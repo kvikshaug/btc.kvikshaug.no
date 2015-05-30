@@ -80,3 +80,19 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+
+# Caching
+# https://docs.djangoproject.com/en/1.8/topics/cache/
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+#
+# BTC project settings
+#
+
+PRICE_ADDRESS = ("localhost", 7139)

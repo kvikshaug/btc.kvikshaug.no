@@ -2,10 +2,8 @@
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-_configuration = os.environ.get('DJANGO_CONFIGURATION', 'dev').lower()
-
+from btc.settings import _configuration
 from btc.conf.prod import *
-from btc.conf.dev import *
 
-from btc.conf.private.prod import *
-from btc.conf.private.dev import *
+if _configuration == 'dev':
+    DEBUG = True

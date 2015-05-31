@@ -58,6 +58,8 @@ class Price(models.Model):
 
         return price
 
+    class Meta:
+        ordering = ['-datetime']
 
 @receiver(post_save, sender=Price)
 def cache_last_price(sender, instance, created, **kwargs):

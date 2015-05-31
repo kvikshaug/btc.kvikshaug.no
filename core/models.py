@@ -21,7 +21,7 @@ class Price(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '%s: kr %s @ %s' % (self.pk, self.nokbtc, self.datetime)
+        return '%s: kr %s @ %s' % (self.pk, round(self.nokbtc, 2), self.datetime)
 
     @property
     def nokbtc(self):

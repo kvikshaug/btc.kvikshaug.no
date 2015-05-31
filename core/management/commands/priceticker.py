@@ -1,6 +1,5 @@
 import json
 import logging
-import socket
 import signal
 
 from django.conf import settings
@@ -22,7 +21,6 @@ class Command(BaseCommand):
         while True:
             try:
                 ticker = Ticker()
-                ticker.listen()
             except (KeyboardInterrupt, Abort):
                 logger.info("Received abort signal; shutting down...")
                 break
@@ -37,7 +35,6 @@ class Command(BaseCommand):
 
 class Ticker:
     BITSTAMP_APP_KEY = 'de504dc5763aeef9ff52'
-    LISTEN_PORT = 7139
 
     def __init__(self, *args, **kwargs):
         # Add signal handlers
@@ -62,21 +59,6 @@ class Ticker:
         self.price = json.loads(data)['price']
         logger.debug("Received new trade price: %s" % self.price)
 
-    def listen(self):
-        """Send the current price as a JSON value (number) to incoming connections"""
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.socket.bind(('', Ticker.LISTEN_PORT))
-        self.socket.listen(5)
-        logger.info("Listening on 0.0.0.0:%s" % Ticker.LISTEN_PORT)
-        while True:
-            client, address = self.socket.accept()
-            logger.debug("Accepted connection, calculating price...")
-            price = self.calculate_price()
-            bytes = json.dumps(price).encode('utf-8')
-            client.send(bytes)
-            client.close()
-
     def calculate_price(self):
         rate = self.exchange_rate.get_rate()
         if self.price is None:
@@ -93,11 +75,6 @@ class Ticker:
     def shutdown(self):
         logger.info("Closing sockets...")
         self.pusher.disconnect()
-        try:
-            self.socket.shutdown(socket.SHUT_WR)
-        except:
-            logger.warning("Unable to shutdown listener socket; ignoring and closing it...")
-        self.socket.close()
         self.exchange_rate.stop()
 
     def handle_signal(self, signum, frame):

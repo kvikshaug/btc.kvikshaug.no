@@ -8,3 +8,7 @@ from btc.conf.prod import *
 if _configuration == 'dev':
     DEBUG = True
     INSTALLED_APPS += ('debug_toolbar',)
+
+    # Limit btc loggers to console, suppress other loggers
+    LOGGING['loggers']['btc']['handlers'] = ['console']
+    LOGGING['root']['handlers'] = []

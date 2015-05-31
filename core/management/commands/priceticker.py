@@ -14,7 +14,7 @@ from core.models import CurrentRate, Price
 from core.management.commands.ticker.exceptions import Abort, Restart
 from core.management.commands.ticker.exchangerate import ExchangeRate
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('btc.priceticker')
 raven_client = raven.Client(settings.SENTRY_DSN)
 
 class Command(BaseCommand):

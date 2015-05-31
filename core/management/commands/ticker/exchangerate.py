@@ -4,7 +4,7 @@ import threading
 
 import requests
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('btc.priceticker.exchangerate')
 
 class ExchangeRate(threading.Thread):
     YAHOO_FINANCE_URL = "https://download.finance.yahoo.com/d/quotes.csv"

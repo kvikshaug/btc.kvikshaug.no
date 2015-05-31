@@ -7,3 +7,4 @@ __pycache__/
 
 btc/static/css/
 db.sqlite3
+btc.log

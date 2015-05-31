@@ -91,6 +91,51 @@ CACHES = {
     }
 }
 
+# Logging
+# https://docs.djangoproject.com/en/1.8/topics/logging/
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(pathname)s:%(lineno)d in %(funcName)s\n%(asctime)s [%(levelname)s] %(name)s: %(message)s\n',
+        },
+        'papertrail': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        },
+    },
+    'handlers': {
+        'papertrail': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.SysLogHandler',
+            'formatter': 'papertrail',
+            'address': ('logs2.papertrailapp.com', 58442),
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'verbose',
+            'filename': os.path.join(BASE_DIR, 'btc.log'),
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'btc': {
+            'handlers': ['papertrail', 'file', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'DEBUG',
+    },
+}
+
 #
 # BTC project settings
 #

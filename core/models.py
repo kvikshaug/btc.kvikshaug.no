@@ -35,6 +35,15 @@ class Price(models.Model):
     def sell_price(self):
         return self.nokbtc * self.sell_rate
 
+    @staticmethod
+    def last_price():
+        price = cache.get('price.last')
+        if price is None:
+            price = Price.objects.order_by('datetime')[:1][0]
+            cache.set('price.last', price, Price.LAST_PRICE_CACHE_PERIOD)
+        return price
+
+
 @receiver(post_save, sender=Price)
 def cache_last_price(sender, instance, created, **kwargs):
     if created:

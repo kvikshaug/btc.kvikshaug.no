@@ -66,15 +66,15 @@ class Ticker:
             usdbtc=new_price,
             usdnok=self.exchange_rate.get_rate(),
             # TODO: Command will need restart for changed settings to take effect; move to DB and change with admin UI
-            rate_buy=settings.BUY_RATE,
-            rate_sell=settings.SELL_RATE,
+            buy_rate=settings.BUY_RATE,
+            sell_rate=settings.SELL_RATE,
         )
         price.save()
         logger.debug("Saved new trade price: %s (USDNOK: %s, buy rate: %s, sell rate: %s)" % (
             price.usdbtc,
             price.usdnok,
-            price.rate_buy,
-            price.rate_sell,
+            price.buy_rate,
+            price.sell_rate,
         ))
 
     def calculate_price(self):

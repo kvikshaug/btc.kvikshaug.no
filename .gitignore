@@ -6,5 +6,6 @@ __pycache__/
 *.sublime-workspace
 
 btc/static/css/
+btc/conf/local.py
 db.sqlite3
 btc.log

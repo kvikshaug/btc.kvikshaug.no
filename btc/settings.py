@@ -10,3 +10,8 @@ from btc.conf.private.prod import *
 if _configuration == 'dev':
     from btc.conf.dev import *
     from btc.conf.private.dev import *
+
+try:
+    from btc.conf.local import *
+except ImportError:
+    pass

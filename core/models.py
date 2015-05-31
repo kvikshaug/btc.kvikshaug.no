@@ -1,7 +1,11 @@
+import logging
+
 from django.core.cache import cache
 from django.dispatch import receiver
 from django.db import models
 from django.db.models.signals import post_save
+
+logger = logging.getLogger('btc.core')
 
 class CurrentRate(models.Model):
     buy_rate = models.DecimalField(max_digits=3, decimal_places=2, null=True)
@@ -34,4 +38,5 @@ class Price(models.Model):
 @receiver(post_save, sender=Price)
 def cache_last_price(sender, instance, created, **kwargs):
     if created:
+        logger.debug("Caching newly created price object as last price: %s" % instance)
         cache.set('price.last', instance, Price.LAST_PRICE_CACHE_PERIOD)

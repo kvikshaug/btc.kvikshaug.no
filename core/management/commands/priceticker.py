@@ -70,7 +70,12 @@ class Ticker:
             rate_sell=settings.SELL_RATE,
         )
         price.save()
-        logger.debug("Saved new trade price: %s (rounded to %s)" % (new_price, Price.to_float(price.usdbtc)))
+        logger.debug("Saved new trade price: %s (USDNOK: %s, buy rate: %s, sell rate: %s)" % (
+            price.usdbtc,
+            price.usdnok,
+            price.rate_buy,
+            price.rate_sell,
+        ))
 
     def calculate_price(self):
         rate = self.exchange_rate.get_rate()

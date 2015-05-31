@@ -1,13 +1,16 @@
 from django.db import models
 
 class Price(models.Model):
-    price = models.PositiveIntegerField()
+    usdbtc = models.PositiveIntegerField()
+    usdnok = models.PositiveIntegerField()
+    rate_buy = models.PositiveIntegerField()
+    rate_sell = models.PositiveIntegerField()
     datetime = models.DateTimeField(auto_now_add=True)
 
-    @property
-    def price_float(self):
-        return self.price / 1000.0
+    @staticmethod
+    def to_float(value):
+        return value / 1000.0
 
-    @price_float.setter
-    def price_float(self, price):
-        self.price = round(price * 1000)
+    @staticmethod
+    def to_int(value):
+        return round(value * 1000)

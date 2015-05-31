@@ -8,6 +8,8 @@ from django.core.management.base import BaseCommand
 import pusherclient
 import raven
 
+from core.models import Price
+
 from core.management.commands.ticker.exceptions import Abort, Restart
 from core.management.commands.ticker.exchangerate import ExchangeRate
 
@@ -21,6 +23,8 @@ class Command(BaseCommand):
         while True:
             try:
                 ticker = Ticker()
+                ticker.pusher.connection.join()
+                logger.warning("Pusher connection exited unexpectedly; restarting...")
             except (KeyboardInterrupt, Abort):
                 logger.info("Received abort signal; shutting down...")
                 break
@@ -56,8 +60,16 @@ class Ticker:
         channel.bind('trade', self.handle_trade)
 
     def handle_trade(self, data):
-        self.price = json.loads(data)['price']
-        logger.debug("Received new trade price: %s" % self.price)
+        new_price = json.loads(data)['price']
+        price = Price(
+            usdbtc=Price.to_int(new_price),
+            usdnok=Price.to_int(self.exchange_rate.get_rate()),
+            # TODO: Command will need restart for changed settings to take effect; move to DB and change with admin UI
+            rate_buy=settings.BUY_RATE,
+            rate_sell=settings.SELL_RATE,
+        )
+        price.save()
+        logger.debug("Saved new trade price: %s (rounded to %s)" % (new_price, Price.to_float(price.usdbtc)))
 
     def calculate_price(self):
         rate = self.exchange_rate.get_rate()

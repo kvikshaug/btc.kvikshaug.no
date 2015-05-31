@@ -6,7 +6,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 class ExchangeRate(threading.Thread):
-    YAHOO_FINANCE_URL = "https://download.finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=USDNOK=X"
+    YAHOO_FINANCE_URL = "https://download.finance.yahoo.com/d/quotes.csv"
     YAHOO_FINANCE_PARAMS = {'e': '.csv', 'f': 'sl1d1t1', 's': 'USDNOK=X'}
     SLEEP_TIME = 60 * 10
 

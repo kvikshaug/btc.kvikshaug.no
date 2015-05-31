@@ -3,17 +3,17 @@ import logging
 import socket
 import signal
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 import pusherclient
-# import raven
+import raven
 
 from core.management.commands.ticker.exceptions import Abort, Restart
 from core.management.commands.ticker.exchangerate import ExchangeRate
-# from core.management.commands.ticker.secrets import SENTRY_DSN
 
 logger = logging.getLogger(__name__)
-# raven_client = raven.Client(SENTRY_DSN)
+raven_client = raven.Client(settings.SENTRY_DSN)
 
 class Command(BaseCommand):
     help = 'Run the price ticker'
@@ -29,7 +29,7 @@ class Command(BaseCommand):
             except Restart:
                 logger.info("Received restart signal; shutting down and restarting...")
             except Exception as e:
-                # raven_client.captureException()
+                raven_client.captureException()
                 logger.error("Unexpected exception: %s" % e)
                 logger.info("Shutting down and restarting...")
             finally:

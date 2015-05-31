@@ -61,21 +61,25 @@ class Ticker:
         channel.bind('trade', self.handle_trade)
 
     def handle_trade(self, data):
-        new_price = json.loads(data, parse_float=decimal.Decimal)['price']
-        current_rate = CurrentRate.objects.get()
-        price = Price(
-            usdbtc=new_price,
-            usdnok=self.exchange_rate.get_rate(),
-            buy_rate=current_rate.buy_rate,
-            sell_rate=current_rate.sell_rate,
-        )
-        price.save()
-        logger.debug("Saved new trade price: %s (USDNOK: %s, buy rate: %s, sell rate: %s)" % (
-            price.usdbtc,
-            price.usdnok,
-            price.buy_rate,
-            price.sell_rate,
-        ))
+        try:
+            new_price = json.loads(data, parse_float=decimal.Decimal)['price']
+            current_rate = CurrentRate.objects.get()
+            price = Price(
+                usdbtc=new_price,
+                usdnok=self.exchange_rate.get_rate(),
+                buy_rate=current_rate.buy_rate,
+                sell_rate=current_rate.sell_rate,
+            )
+            price.save()
+            logger.debug("Saved new trade price: %s (USDNOK: %s, buy rate: %s, sell rate: %s)" % (
+                price.usdbtc,
+                price.usdnok,
+                price.buy_rate,
+                price.sell_rate,
+            ))
+        except Exception as e:
+            raven_client.captureException()
+            logger.error("Exception while handling trade event (captured by Sentry): %s" % e)
 
     def shutdown(self):
         logger.info("Closing sockets...")

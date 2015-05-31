@@ -7,3 +7,4 @@ from btc.conf.prod import *
 
 if _configuration == 'dev':
     DEBUG = True
+    INSTALLED_APPS += ('debug_toolbar',)

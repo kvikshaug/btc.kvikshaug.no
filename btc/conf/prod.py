@@ -113,6 +113,10 @@ LOGGING = {
             'formatter': 'papertrail',
             'address': ('logs2.papertrailapp.com', 58442),
         },
+        'sentry': {
+            'level': 'WARNING',
+            'class': 'raven.handlers.logging.SentryHandler',
+        },
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
@@ -127,7 +131,7 @@ LOGGING = {
     },
     'loggers': {
         'btc': {
-            'handlers': ['papertrail', 'file', 'console'],
+            'handlers': ['papertrail', 'sentry', 'file', 'console'],
             'propagate': True,
             'level': 'DEBUG',
         },

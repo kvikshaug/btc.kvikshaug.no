@@ -42,7 +42,7 @@ class Price(models.Model):
     def last_price():
         price = cache.get('price.last')
         if price is None:
-            price = Price.objects.order_by('datetime')[:1][0]
+            price = Price.objects.order_by('-datetime')[:1][0]
             cache.set('price.last', price, Price.LAST_PRICE_CACHE_PERIOD)
 
         # Check that the last price isn't too old. It might be possible that there just hasn't been any trades for

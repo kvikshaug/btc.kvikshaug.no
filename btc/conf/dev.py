@@ -12,3 +12,6 @@ if _configuration == 'dev':
     # Limit btc loggers to console, suppress other loggers
     LOGGING['loggers']['btc']['handlers'] = ['console']
     LOGGING['root']['handlers'] = []
+
+    # Deactivate Sentry
+    SENTRY_DSN = None

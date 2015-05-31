@@ -26,8 +26,8 @@ def index(request):
                 prev_sell,
             ])
             date_point += timedelta(minutes=settings.CHART_GRANULARITY)
-        prev_buy = price.buy_price()
-        prev_sell = price.sell_price()
+        prev_buy = float(round(price.buy_price, 2))
+        prev_sell = float(round(price.sell_price, 2))
 
     context = {
         'price': Price.objects.order_by('datetime')[:1][0],

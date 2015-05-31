@@ -1,3 +1,4 @@
+import decimal
 import json
 import logging
 import signal
@@ -60,16 +61,21 @@ class Ticker:
         channel.bind('trade', self.handle_trade)
 
     def handle_trade(self, data):
-        new_price = json.loads(data)['price']
+        new_price = json.loads(data, parse_float=decimal.Decimal)['price']
         price = Price(
-            usdbtc=Price.to_int(new_price),
-            usdnok=Price.to_int(self.exchange_rate.get_rate()),
+            usdbtc=new_price,
+            usdnok=self.exchange_rate.get_rate(),
             # TODO: Command will need restart for changed settings to take effect; move to DB and change with admin UI
-            rate_buy=settings.BUY_RATE,
-            rate_sell=settings.SELL_RATE,
+            buy_rate=settings.BUY_RATE,
+            sell_rate=settings.SELL_RATE,
         )
         price.save()
-        logger.debug("Saved new trade price: %s (rounded to %s)" % (new_price, Price.to_float(price.usdbtc)))
+        logger.debug("Saved new trade price: %s (USDNOK: %s, buy rate: %s, sell rate: %s)" % (
+            price.usdbtc,
+            price.usdnok,
+            price.buy_rate,
+            price.sell_rate,
+        ))
 
     def calculate_price(self):
         rate = self.exchange_rate.get_rate()

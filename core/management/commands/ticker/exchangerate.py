@@ -1,3 +1,4 @@
+import decimal
 import logging
 import threading
 
@@ -6,7 +7,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 class ExchangeRate(threading.Thread):
-    YAHOO_FINANCE_URL = "https://download.finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=USDNOK=X"
+    YAHOO_FINANCE_URL = "https://download.finance.yahoo.com/d/quotes.csv"
     YAHOO_FINANCE_PARAMS = {'e': '.csv', 'f': 'sl1d1t1', 's': 'USDNOK=X'}
     SLEEP_TIME = 60 * 10
 
@@ -28,7 +29,7 @@ class ExchangeRate(threading.Thread):
                 logger.debug("Fetching exchange rates from Yahoo Finance...")
                 csv = requests.get(ExchangeRate.YAHOO_FINANCE_URL, params=ExchangeRate.YAHOO_FINANCE_PARAMS).text
                 name, rate, date, time = csv.split(',')
-                self.rate = float(rate)
+                self.rate = decimal.Decimal(rate)
                 self.stop_event.wait(ExchangeRate.SLEEP_TIME)
             except Exception as e:
                 logger.warning("Unhandled exception: %s" % e)

@@ -15,3 +15,9 @@ LOGGING['root']['handlers'] = []
 
 # Deactivate Sentry
 RAVEN_CONFIG['dsn'] = None
+
+# Fallback to local memory in development
+CACHES['default'] = {
+    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    'LOCATION': 'btc.kvikshaug.no',
+}

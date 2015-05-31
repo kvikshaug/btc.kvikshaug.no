@@ -77,19 +77,6 @@ class Ticker:
             price.sell_rate,
         ))
 
-    def calculate_price(self):
-        rate = self.exchange_rate.get_rate()
-        if self.price is None:
-            logger.warning("Asked to calculate price, but no trade has been recorded yet; returning None")
-            return None
-        elif rate is None:
-            logger.warning("Asked to calculate price, but the exchange rate hasn't been fetched yet; returning None")
-            return None
-        else:
-            nok_price = self.price * rate
-            logger.debug("Current price: kr %s (USD: %s, USDNOK rate: %s)" % (nok_price, self.price, rate))
-            return nok_price
-
     def shutdown(self):
         logger.info("Closing sockets...")
         self.pusher.disconnect()

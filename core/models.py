@@ -1,5 +1,9 @@
 from django.db import models
 
+class CurrentRate(models.Model):
+    buy_rate = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    sell_rate = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+
 class Price(models.Model):
     usdbtc = models.DecimalField(max_digits=14, decimal_places=8, null=True)
     usdnok = models.DecimalField(max_digits=12, decimal_places=8, null=True)

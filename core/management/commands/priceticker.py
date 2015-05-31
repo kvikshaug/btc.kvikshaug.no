@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 import pusherclient
 import raven
 
-from core.models import Price
+from core.models import CurrentRate, Price
 
 from core.management.commands.ticker.exceptions import Abort, Restart
 from core.management.commands.ticker.exchangerate import ExchangeRate
@@ -62,12 +62,12 @@ class Ticker:
 
     def handle_trade(self, data):
         new_price = json.loads(data, parse_float=decimal.Decimal)['price']
+        current_rate = CurrentRate.objects.get()
         price = Price(
             usdbtc=new_price,
             usdnok=self.exchange_rate.get_rate(),
-            # TODO: Command will need restart for changed settings to take effect; move to DB and change with admin UI
-            buy_rate=settings.BUY_RATE,
-            sell_rate=settings.SELL_RATE,
+            buy_rate=current_rate.buy_rate,
+            sell_rate=current_rate.sell_rate,
         )
         price.save()
         logger.debug("Saved new trade price: %s (USDNOK: %s, buy rate: %s, sell rate: %s)" % (

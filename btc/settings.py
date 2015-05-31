@@ -7,5 +7,6 @@ _configuration = os.environ.get('DJANGO_CONFIGURATION', 'dev').lower()
 from btc.conf.prod import *
 from btc.conf.private.prod import *
 
-from btc.conf.dev import *
-from btc.conf.private.dev import *
+if _configuration == 'dev':
+    from btc.conf.dev import *
+    from btc.conf.private.dev import *

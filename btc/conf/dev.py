@@ -6,13 +6,12 @@ from btc.settings import _configuration
 from btc.conf.prod import *
 from btc.conf.private.prod import *
 
-if _configuration == 'dev':
-    DEBUG = True
-    INSTALLED_APPS += ('debug_toolbar',)
+DEBUG = True
+INSTALLED_APPS += ('debug_toolbar',)
 
-    # Limit btc loggers to console, suppress other loggers
-    LOGGING['loggers']['btc']['handlers'] = ['console']
-    LOGGING['root']['handlers'] = []
+# Limit btc loggers to console, suppress other loggers
+LOGGING['loggers']['btc']['handlers'] = ['console']
+LOGGING['root']['handlers'] = []
 
-    # Deactivate Sentry
-    RAVEN_CONFIG['dsn'] = None
+# Deactivate Sentry
+RAVEN_CONFIG['dsn'] = None

@@ -16,6 +16,9 @@ class Price(models.Model):
     sell_rate = models.DecimalField(max_digits=3, decimal_places=2, null=True)
     datetime = models.DateTimeField(auto_now_add=True)
 
+    def __unicode__(self):
+        return u'%s: kr %s @ %s' % (self.pk, self.nokbtc, self.datetime)
+
     @property
     def nokbtc(self):
         return self.usdbtc * self.usdnok

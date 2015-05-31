@@ -15,7 +15,7 @@ from core.management.commands.ticker.exceptions import Abort, Restart
 from core.management.commands.ticker.exchangerate import ExchangeRate
 
 logger = logging.getLogger('btc.priceticker')
-raven_client = raven.Client(settings.SENTRY_DSN)
+raven_client = raven.Client(settings.RAVEN_CONFIG['dsn'])
 
 class Command(BaseCommand):
     help = 'Run the price ticker'

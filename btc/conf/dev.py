@@ -14,4 +14,4 @@ if _configuration == 'dev':
     LOGGING['root']['handlers'] = []
 
     # Deactivate Sentry
-    SENTRY_DSN = None
+    RAVEN_CONFIG['dsn'] = None

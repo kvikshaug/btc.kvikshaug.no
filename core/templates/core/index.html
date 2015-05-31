@@ -13,20 +13,39 @@
 
   <hr>
 
-  <p>
-    Gjeldende kurs pr. {% now "j. F Y H:i:s" %}:
-  </p>
 
-  <table class="current-price">
-    <tr class="buy">
-      <th>Kjøp:</th>
-      <td>kr. {{ price.buy_price|floatformat:2 }}</td>
-    </tr>
-    <tr class="sell">
-      <th>Salg:</th>
-      <td>kr. {{ price.sell_price|floatformat:2 }}</td>
-    </tr>
-  </table>
+  <div class="current-price">
+    <p class="date-label">
+      Gjeldende kurs pr. {% now "j. F Y H:i:s" %}
+    </p>
+
+    <div class="row">
+      <div class="col-xs-6">
+
+        <div class="buy text-right">
+          <div class="buy-label">
+            Kjøp
+          </div>
+          <div class="price">
+            kr. {{ price.buy_price|floatformat:2 }}
+          </div>
+        </div>
+
+      </div>
+      <div class="col-xs-6">
+
+        <div class="sell">
+          <div class="buy-label">
+            Salg
+          </div>
+          <div class="price">
+            kr. {{ price.sell_price|floatformat:2 }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <div class="chart"></div>
 

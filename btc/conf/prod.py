@@ -96,3 +96,4 @@ CACHES = {
 #
 
 PRICE_ADDRESS = ("localhost", 7139)
+CHART_GRANULARITY = 5 # Minutes between price measurements

@@ -1,5 +1,12 @@
 {% extends 'layout.html' %}
 
+{% block javascript %}
+  <script>
+    window.Kvikshaug.price_history = JSON.parse("{{ price_history|escapejs }}");
+    window.Kvikshaug.price_history_title = "Kurs siste 24 timer";
+  </script>
+{% endblock %}
+
 {% block body %}
 
   <h1>Kjøp og selg bitcoins</h1>
@@ -20,6 +27,8 @@
       <td>kr. {{ price.sell_price|floatformat:2 }}</td>
     </tr>
   </table>
+
+  <div class="chart"></div>
 
   <hr>
 

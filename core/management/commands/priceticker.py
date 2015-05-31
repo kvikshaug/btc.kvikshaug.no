@@ -4,6 +4,7 @@ import logging
 import signal
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.management.base import BaseCommand
 
 import pusherclient
@@ -70,6 +71,7 @@ class Ticker:
             sell_rate=current_rate.sell_rate,
         )
         price.save()
+        cache.set('price.last', price, Price.LAST_PRICE_CACHE_PERIOD)
         logger.debug("Saved new trade price: %s (USDNOK: %s, buy rate: %s, sell rate: %s)" % (
             price.usdbtc,
             price.usdnok,

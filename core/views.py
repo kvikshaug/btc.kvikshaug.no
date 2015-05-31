@@ -2,6 +2,7 @@ from datetime import timedelta
 import json
 
 from django.conf import settings
+from django.core.cache import cache
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -29,8 +30,13 @@ def index(request):
         prev_buy = float(round(price.buy_price, 2))
         prev_sell = float(round(price.sell_price, 2))
 
+    price = cache.get('price.last')
+    if price is None:
+        price = Price.objects.order_by('datetime')[:1][0]
+        cache.set('price.last', price, Price.LAST_PRICE_CACHE_PERIOD)
+
     context = {
-        'price': Price.objects.order_by('datetime')[:1][0],
+        'price': price,
         'price_history': json.dumps(price_history),
     }
     return render(request, 'core/index.html', context)

@@ -5,6 +5,8 @@ class CurrentRate(models.Model):
     sell_rate = models.DecimalField(max_digits=3, decimal_places=2, null=True)
 
 class Price(models.Model):
+    LAST_PRICE_CACHE_PERIOD = 60 * 60
+
     usdbtc = models.DecimalField(max_digits=14, decimal_places=8, null=True)
     usdnok = models.DecimalField(max_digits=12, decimal_places=8, null=True)
     buy_rate = models.DecimalField(max_digits=3, decimal_places=2, null=True)

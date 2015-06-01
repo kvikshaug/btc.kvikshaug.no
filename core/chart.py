@@ -9,6 +9,9 @@ def get_price_history():
     now = timezone.now()
     one_day_ago = now - timedelta(days=1)
 
+    # Let's always start the chart at *the start of* an hour. This'll make caching easier
+    one_day_ago -= timedelta(minutes=one_day_ago.minute, seconds=one_day_ago.second)
+
     # We might need to include price objects from *CHART_GRANULARITY* minutes before the point 24h ago
     # That's a bit arbitrary; a trade price *could* be from even before the granularity + 24h ago and still be the
     # relevant price we want to display, but that's not handled for now - if there's no price within the granularity

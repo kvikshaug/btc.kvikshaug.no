@@ -21,10 +21,10 @@ def get_price_history():
     date_point = one_day_ago
     previous_price = None
     while date_point < one_hour_ago:
-        hour_set = cache.get('price.history.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:00"))
+        hour_set = cache.get('price.history.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
         if hour_set is None:
             hour_set = _calculate_hour(date_point, previous_price, now)
-            cache.set('price.history.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:00"), hour_set, 60 * 60 * 24)
+            cache.set('price.history.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
         hour_history, previous_price = hour_set
         price_history.extend(hour_history)
         date_point += timedelta(hours=1)

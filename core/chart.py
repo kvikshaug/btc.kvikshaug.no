@@ -1,3 +1,4 @@
+from itertools import groupby
 from datetime import timedelta
 
 from django.conf import settings
@@ -23,26 +24,46 @@ def get_price_history():
     ]
 
     date_point = one_day_ago
+    previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
     previous_price = None
     price_index = 0
 
-    # Note: For *first* hour of the chart, using the CHART_GRANULARITY time range to find the previous price is a bit
-    # arbitrary. A trade price *could* be from even before the granularity + 24h ago and still be the relevant price
-    # we want to display, but that's not handled for now - if there's no price within the granularity period, it'll be
-    # rendered as a *missing* value.
-    previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
+    # Retrieve as many cached query results as possible, before selecting the remainder
+    query_start_date = date_point
+    prices = []
+    while True:
+        price_hour = cache.get('price.history.query.by_hour.%s' % query_start_date.strftime("%d.%m.%Y.%H:%M"))
+        if price_hour is None:
+            # End of cache; stop
+            break
+        elif query_start_date >= one_hour_ago:
+            # Cached up to an hour ago? We don't want that; stop
+            break
+        else:
+            prices.extend(price_hour)
+            query_start_date += timedelta(hours=1)
 
+    # Select *remaining* prices and cache them by the hour
     # Note that this query actually is quite heavy on the CPU because of decimal conversions
-    prices = Price.objects.filter(
-        datetime__gte=previous_date_point,
-        datetime__lte=now,
-    ).order_by('datetime')
+    remaining_prices = Price.objects.filter(datetime__gte=query_start_date, datetime__lte=now).order_by('datetime')
+    prices.extend(remaining_prices)
+    for hour, hour_prices in groupby(remaining_prices, key=lambda p: p.datetime.strftime("%H:00")):
+        # Cache by hour, up until, but not including, the last hour
+        hour_prices = list(hour_prices)
+        if hour_prices[0].datetime < one_hour_ago:
+            cache.set(
+                'price.history.query.by_hour.%s' % (
+                    hour_prices[0].datetime.strftime("%d.%m.%Y.%H:00")
+                ),
+                hour_prices,
+                60 * 60 * 24,
+            )
 
     while date_point < one_hour_ago:
-        hour_set = cache.get('price.history.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
+        hour_set = cache.get('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
         if hour_set is None:
             hour_set = _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now)
-            cache.set('price.history.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
+            cache.set('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
         hour_history, price_index, previous_price = hour_set
         price_history.extend(hour_history)
         date_point += timedelta(hours=1)

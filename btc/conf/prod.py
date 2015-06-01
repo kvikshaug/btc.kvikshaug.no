@@ -146,4 +146,4 @@ LOGGING = {
 # BTC project settings
 #
 
-CHART_GRANULARITY = 5 # Minutes between price measurements
+CHART_GRANULARITY = 3 # Minutes between price measurements

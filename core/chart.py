@@ -30,8 +30,14 @@ def get_price_history():
     previous_price = None
     price_index = 0
 
-    # Retrieve as many cached query results as possible, before selecting the remainder
-    query_start_date = date_point
+    # Include an extra hour, which might be fetched by cache or query, in order to make sure the price *previous to the
+    # very first one in the chart* is included. If it weren't, that data point would be null, since price history would
+    # by definition start *after* that data point. If the case is that no trades have happened in that hour, the data
+    # point will still be null (and further ones after that until a trade has happened).
+    one_hour_before_date_point = date_point - timedelta(hours=1)
+
+    # Now retrieve as many cached query results as possible, before selecting the remainder
+    query_start_date = one_hour_before_date_point
     prices = []
     while True:
         price_hour = cache.get('price.history.query.by_hour.%s' % query_start_date.strftime("%d.%m.%Y.%H:%M"))
@@ -58,8 +64,14 @@ def get_price_history():
                     hour_prices[0].datetime.strftime("%d.%m.%Y.%H:00")
                 ),
                 hour_prices,
-                60 * 60 * 24,
+                60 * 60 * 25, # Note that we're caching for 25 hours since we'll be quering 25 hours back
             )
+
+    # Now that we've retrieved or queried all prices, there should be some extra ones from the hour *before* 24h ago.
+    # Find the latest one of them (if any), and set that one as the previous price
+    prices_before_chart_start = [p for p in prices if p.datetime < date_point]
+    if len(prices_before_chart_start) > 0:
+        previous_price = prices_before_chart_start[-1]
 
     while date_point < one_hour_ago:
         hour_set = cache.get('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))

@@ -20,36 +20,38 @@ def get_price_history():
 
     date_point = one_day_ago
     previous_price = None
+    price_index = 0
+
+    # Note: For *first* hour of the chart, using the CHART_GRANULARITY time range to find the previous price is a bit
+    # arbitrary. A trade price *could* be from even before the granularity + 24h ago and still be the relevant price
+    # we want to display, but that's not handled for now - if there's no price within the granularity period, it'll be
+    # rendered as a *missing* value.
+    previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
+
+    # Note that this query actually is quite heavy on the CPU because of decimal conversions
+    prices = Price.objects.filter(
+        datetime__gte=previous_date_point,
+        datetime__lte=now,
+    ).order_by('datetime')
+
     while date_point < one_hour_ago:
         hour_set = cache.get('price.history.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
         if hour_set is None:
-            hour_set = _calculate_hour(date_point, previous_price, now)
+            hour_set = _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now)
             cache.set('price.history.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
-        hour_history, previous_price = hour_set
+        hour_history, price_index, previous_price = hour_set
         price_history.extend(hour_history)
         date_point += timedelta(hours=1)
 
     # We're at the last hour; calculate that without caching it
-    hour_set = _calculate_hour(date_point, previous_price, now)
-    hour_history, previous_price = hour_set
+    hour_set = _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now)
+    hour_history, price_index, previous_price = hour_set
     price_history.extend(hour_history)
     return price_history
 
-def _calculate_hour(date_point, previous_price, now):
+def _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now):
     an_hour_from_datepoint = date_point + timedelta(hours=1)
 
-    # Note: If this is the *first* hour of the chart, using the CHART_GRANULARITY time range to find the previous
-    # price is a bit arbitrary. A trade price *could* be from even before the granularity + 24h ago and still be the
-    # relevant price we want to display, but that's not handled for now - if there's no price within the granularity
-    # period, it'll be rendered as a *missing* value.
-    previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
-
-    prices = Price.objects.filter(
-        datetime__gte=previous_date_point,
-        datetime__lte=an_hour_from_datepoint,
-    ).order_by('datetime')
-
-    price_index = 0
     price_count = len(prices)
     hour_history = []
 
@@ -95,4 +97,4 @@ def _calculate_hour(date_point, previous_price, now):
 
         previous_date_point = date_point
         date_point += timedelta(minutes=settings.CHART_GRANULARITY)
-    return hour_history, previous_price
+    return hour_history, price_index, previous_price

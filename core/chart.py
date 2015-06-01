@@ -12,18 +12,20 @@ def get_price_history():
     one_hour_ago = now - timedelta(hours=1)
     one_day_ago = now - timedelta(days=1)
 
-    # Let's always start the chart at *the start of* an hour. This'll make caching easier
-    one_day_ago -= timedelta(
-        minutes=one_day_ago.minute,
-        seconds=one_day_ago.second,
-        microseconds=one_day_ago.microsecond,
-    )
-
     price_history = [
         ['Tid', 'Kjøp', 'Salg'],
     ]
 
+    # The date point begins at the start of the chart and will increment with the chart granularity
     date_point = one_day_ago
+
+    # Let's always start the chart at *the start of* an hour. This'll make caching easier
+    date_point -= timedelta(
+        minutes=date_point.minute,
+        seconds=date_point.second,
+        microseconds=date_point.microsecond,
+    )
+
     previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
     previous_price = None
     price_index = 0

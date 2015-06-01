@@ -12,7 +12,11 @@ def get_price_history():
     one_day_ago = now - timedelta(days=1)
 
     # Let's always start the chart at *the start of* an hour. This'll make caching easier
-    one_day_ago -= timedelta(minutes=one_day_ago.minute, seconds=one_day_ago.second)
+    one_day_ago -= timedelta(
+        minutes=one_day_ago.minute,
+        seconds=one_day_ago.second,
+        microseconds=one_day_ago.microsecond,
+    )
 
     price_history = [
         ['Tid', 'Kjøp', 'Salg'],

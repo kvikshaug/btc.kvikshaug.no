@@ -17,7 +17,7 @@ class Price(models.Model):
     LAST_PRICE_CACHE_PERIOD = 60 * 60
     LAST_PRICE_ACCEPTABLE_AGE = 60 * 15
 
-    usdbtc = models.DecimalField(max_digits=14, decimal_places=8, null=True)
+    btcusd = models.DecimalField(max_digits=14, decimal_places=8, null=True)
     usdnok = models.DecimalField(max_digits=12, decimal_places=8, null=True)
     buy_rate = models.DecimalField(max_digits=3, decimal_places=2, null=True)
     sell_rate = models.DecimalField(max_digits=3, decimal_places=2, null=True)
@@ -28,7 +28,7 @@ class Price(models.Model):
 
     @property
     def nokbtc(self):
-        return self.usdbtc * self.usdnok
+        return self.btcusd * self.usdnok
 
     @property
     def buy_price(self):

@@ -61,14 +61,14 @@ class Ticker:
             new_price = json.loads(data, parse_float=decimal.Decimal)['price']
             current_rate = CurrentRate.objects.get()
             price = Price(
-                usdbtc=new_price,
+                btcusd=new_price,
                 usdnok=self.exchange_rate.get_rate(),
                 buy_rate=current_rate.buy_rate,
                 sell_rate=current_rate.sell_rate,
             )
             price.save()
             logger.debug("Saved new trade price: %s (USDNOK: %s, buy rate: %s, sell rate: %s)" % (
-                price.usdbtc,
+                price.btcusd,
                 price.usdnok,
                 price.buy_rate,
                 price.sell_rate,

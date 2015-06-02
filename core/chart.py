@@ -129,7 +129,7 @@ def _calculate_hour(previous_date_point, date_point, prices, price_index, previo
             sell_price = float(round(previous_price.sell_price, 2))
 
         hour_history.append([
-            date_point.strftime("%H:%M"),
+            timezone.localtime(date_point).strftime("%H:%M"),
             buy_price,
             sell_price,
         ])

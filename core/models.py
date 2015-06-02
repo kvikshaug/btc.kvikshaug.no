@@ -24,19 +24,19 @@ class Price(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '%s: kr %s @ %s' % (self.pk, round(self.nokbtc, 2), self.datetime)
+        return '%s: kr %s @ %s' % (self.pk, round(self.btcnok, 2), self.datetime)
 
     @property
-    def nokbtc(self):
+    def btcnok(self):
         return self.btcusd * self.usdnok
 
     @property
     def buy_price(self):
-        return self.nokbtc * self.buy_rate
+        return self.btcnok * self.buy_rate
 
     @property
     def sell_price(self):
-        return self.nokbtc * self.sell_rate
+        return self.btcnok * self.sell_rate
 
     @staticmethod
     def last_price():

@@ -108,7 +108,7 @@ LOGGING = {
     },
     'handlers': {
         'papertrail': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.handlers.SysLogHandler',
             'formatter': 'papertrail',
             'address': ('logs2.papertrailapp.com', 58442),

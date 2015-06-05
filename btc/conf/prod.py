@@ -127,6 +127,12 @@ LOGGING = {
             'formatter': 'verbose',
             'filename': os.path.join(BASE_DIR, 'btc.log'),
         },
+        'libraries': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'verbose',
+            'filename': os.path.join(BASE_DIR, 'btc.libraries.log'),
+        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -142,7 +148,7 @@ LOGGING = {
 
         # 3rd party libraries
         'pusherclient': {
-            'handlers': [],
+            'handlers': ['libraries'],
             'propagate': True,
             'level': 'DEBUG',
         },

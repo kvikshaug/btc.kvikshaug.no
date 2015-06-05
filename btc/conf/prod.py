@@ -105,6 +105,10 @@ LOGGING = {
         'papertrail': {
             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
         },
+        'simple': {
+            # Incidentally equal to the papertrail format
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        },
     },
     'handlers': {
         'papertrail': {

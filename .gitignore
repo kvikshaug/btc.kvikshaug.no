@@ -9,3 +9,4 @@ btc/static/css/
 btc/conf/local.py
 db.sqlite3
 btc.log
+btc.libraries.log

@@ -94,7 +94,7 @@ def _calculate_hour(previous_date_point, date_point, prices, price_index, previo
     price_count = len(prices)
     hour_history = []
 
-    # Iterate while we're within the our, and while we're not in the future (latter case applies for the final hour
+    # Iterate while we're within the hour, and while we're not in the future (latter case applies for the final hour
     # calculation)
     while date_point <= an_hour_from_datepoint and date_point <= now:
         # Find the latest price within the granularity range. Keep an index in order to iterate the prices along with

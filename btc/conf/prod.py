@@ -130,7 +130,7 @@ LOGGING = {
         'libraries': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'formatter': 'verbose',
+            'formatter': 'simple',
             'filename': os.path.join(BASE_DIR, 'btc.libraries.log'),
         },
         'console': {

@@ -11,7 +11,7 @@ INSTALLED_APPS += ('debug_toolbar',)
 
 # Limit btc loggers to console, suppress other loggers
 LOGGING['loggers']['btc']['handlers'] = ['console']
-LOGGING['root']['handlers'] = []
+LOGGING['loggers']['pusherclient']['handlers'] = []
 
 # Deactivate Sentry
 RAVEN_CONFIG['dsn'] = None

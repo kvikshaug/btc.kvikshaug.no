@@ -141,7 +141,7 @@ LOGGING = {
     },
     'loggers': {
         'btc': {
-            'handlers': ['papertrail', 'sentry', 'file', 'console'],
+            'handlers': ['papertrail', 'sentry', 'file'],
             'propagate': True,
             'level': 'DEBUG',
         },

@@ -135,10 +135,14 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
-    },
-    'root': {
-        'handlers': ['file'],
-        'level': 'DEBUG',
+
+        # 3rd party libraries
+        'pusherclient': {
+            'handlers': [],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+
     },
 }
 

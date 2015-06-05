@@ -2,7 +2,6 @@
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-from btc.settings import _configuration
 from btc.conf.prod import *
 from btc.conf.private.prod import *
 

@@ -26,8 +26,6 @@ def get_price_history():
         microseconds=date_point.microsecond,
     )
 
-    previous_price = None
-
     # Include an extra hour, which might be fetched by cache or query, in order to make sure the price *previous to the
     # very first one in the chart* is included. If it weren't, that data point would be null, since price history would
     # by definition start *after* that data point. If the case is that no trades have happened in that hour, the data
@@ -67,6 +65,7 @@ def get_price_history():
 
     # Now that we've retrieved or queried all prices, there should be some extra ones from the hour *before* 24h ago.
     # Find the latest one of them (if any), and set that one as the previous price
+    previous_price = None
     prices_before_chart_start = [p for p in prices if p.datetime < date_point]
     if len(prices_before_chart_start) > 0:
         previous_price = prices_before_chart_start[-1]

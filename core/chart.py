@@ -26,10 +26,6 @@ def get_price_history():
         microseconds=date_point.microsecond,
     )
 
-    previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
-    previous_price = None
-    price_index = 0
-
     # Include an extra hour, which might be fetched by cache or query, in order to make sure the price *previous to the
     # very first one in the chart* is included. If it weren't, that data point would be null, since price history would
     # by definition start *after* that data point. If the case is that no trades have happened in that hour, the data
@@ -69,30 +65,72 @@ def get_price_history():
 
     # Now that we've retrieved or queried all prices, there should be some extra ones from the hour *before* 24h ago.
     # Find the latest one of them (if any), and set that one as the previous price
+    previous_price = None
     prices_before_chart_start = [p for p in prices if p.datetime < date_point]
     if len(prices_before_chart_start) > 0:
         previous_price = prices_before_chart_start[-1]
 
+    # Finally group the prices by date and hour, so we can easily calculate plot points per hour
+    prices_by_hour = {}
+    for group, price_group in groupby(prices, key=lambda p: p.datetime.strftime("%d.%H:00")):
+        prices_by_hour[group] = list(price_group)
+
+    # Now iterate each hour, calculate the prices for each of them and cache most of the results, except for the very
+    # last hour - we'll want to recalculate that with new trade data each request until a complete hour history has
+    # been recorded. After caching we'll remove prices older than 24h ago, so that the chart plots exactly 24h at any
+    # time.
+    twentyfour_hours_ago = now - timedelta(hours=24)
     while date_point < one_hour_ago:
         hour_set = cache.get('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
         if hour_set is None:
-            hour_set = _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now)
+            try:
+                prices_this_hour = prices_by_hour[date_point.strftime("%d.%H:00")]
+            except KeyError:
+                # Probably won't occur here unless
+                # a) there's a serious issue with the stock exchange, or
+                # b) our ticker has stopped for over an hour
+                prices_this_hour = []
+            hour_set = _calculate_hour(date_point, now, previous_price, prices_this_hour)
             cache.set('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
-        hour_history, price_index, previous_price = hour_set
+        hour_history, previous_price = hour_set
+
+        # Remove results older than 24h ago, now that they're cached
+        if date_point < twentyfour_hours_ago:
+            hour_history_within_24h = []
+            for h in hour_history:
+                _, minute = h[0].split(":")
+                if int(minute) >= now.minute:
+                    hour_history_within_24h.append(h)
+            hour_history = hour_history_within_24h
+
         price_history.extend(hour_history)
         date_point += timedelta(hours=1)
 
     # We're at the last hour; calculate that without caching it
-    hour_set = _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now)
-    hour_history, price_index, previous_price = hour_set
+    try:
+        prices_this_hour = prices_by_hour[date_point.strftime("%d.%H:00")]
+    except KeyError:
+        # Might occur at the start of a new hour when no trades have been recorded
+        prices_this_hour = []
+    hour_set = _calculate_hour(date_point, now, previous_price, prices_this_hour)
+    hour_history, previous_price = hour_set
     price_history.extend(hour_history)
     return price_history
 
-def _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now):
+def _calculate_hour(date_point, now, previous_price, prices):
+    """
+    Calculates a list of plot points with applicable prices for one hour.
+    - date_point: The datetime to begin calculations at; the start of an hour
+    - now: The current datetime; passed as reference to avoid skew during code execution
+    - previous_price: The applicable price *before* the current date_point start, may be None if unknown
+    - prices: A list of trade prices for the applicable hour
+    """
     an_hour_from_datepoint = date_point + timedelta(hours=1)
 
+    price_index = 0
     price_count = len(prices)
     hour_history = []
+    previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
 
     # Iterate while we're within the hour, and while we're not in the future (latter case applies for the final hour
     # calculation)
@@ -136,4 +174,4 @@ def _calculate_hour(previous_date_point, date_point, prices, price_index, previo
 
         previous_date_point = date_point
         date_point += timedelta(minutes=settings.CHART_GRANULARITY)
-    return hour_history, price_index, previous_price
+    return hour_history, previous_price

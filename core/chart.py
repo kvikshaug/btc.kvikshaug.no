@@ -88,6 +88,16 @@ def get_price_history():
             hour_set = _calculate_hour(date_point, now, previous_price, prices_this_hour)
             cache.set('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
         hour_history, previous_price = hour_set
+
+        # Remove results older than 24h ago, now that they're cached
+        if date_point < now - timedelta(hours=24):
+            hour_history_within_24h = []
+            for h in hour_history:
+                _, minute = h[0].split(":")
+                if int(minute) >= now.minute:
+                    hour_history_within_24h.append(h)
+            hour_history = hour_history_within_24h
+
         price_history.extend(hour_history)
         date_point += timedelta(hours=1)
 

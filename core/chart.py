@@ -28,7 +28,6 @@ def get_price_history():
 
     previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
     previous_price = None
-    price_index = 0
 
     # Include an extra hour, which might be fetched by cache or query, in order to make sure the price *previous to the
     # very first one in the chart* is included. If it weren't, that data point would be null, since price history would
@@ -76,21 +75,22 @@ def get_price_history():
     while date_point < one_hour_ago:
         hour_set = cache.get('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
         if hour_set is None:
-            hour_set = _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now)
+            hour_set = _calculate_hour(previous_date_point, date_point, prices, previous_price, now)
             cache.set('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
-        hour_history, price_index, previous_price = hour_set
+        hour_history, previous_price = hour_set
         price_history.extend(hour_history)
         date_point += timedelta(hours=1)
 
     # We're at the last hour; calculate that without caching it
-    hour_set = _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now)
-    hour_history, price_index, previous_price = hour_set
+    hour_set = _calculate_hour(previous_date_point, date_point, prices, previous_price, now)
+    hour_history, previous_price = hour_set
     price_history.extend(hour_history)
     return price_history
 
-def _calculate_hour(previous_date_point, date_point, prices, price_index, previous_price, now):
+def _calculate_hour(previous_date_point, date_point, prices, previous_price, now):
     an_hour_from_datepoint = date_point + timedelta(hours=1)
 
+    price_index = 0
     price_count = len(prices)
     hour_history = []
 
@@ -136,4 +136,4 @@ def _calculate_hour(previous_date_point, date_point, prices, price_index, previo
 
         previous_date_point = date_point
         date_point += timedelta(minutes=settings.CHART_GRANULARITY)
-    return hour_history, price_index, previous_price
+    return hour_history, previous_price

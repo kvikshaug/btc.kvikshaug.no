@@ -26,7 +26,6 @@ def get_price_history():
         microseconds=date_point.microsecond,
     )
 
-    previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
     previous_price = None
 
     # Include an extra hour, which might be fetched by cache or query, in order to make sure the price *previous to the
@@ -87,7 +86,7 @@ def get_price_history():
                 # a) there's a serious issue with the stock exchange, or
                 # b) our ticker has stopped for over an hour
                 prices_this_hour = []
-            hour_set = _calculate_hour(previous_date_point, date_point, now, previous_price, prices_this_hour)
+            hour_set = _calculate_hour(date_point, now, previous_price, prices_this_hour)
             cache.set('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
         hour_history, previous_price = hour_set
         price_history.extend(hour_history)
@@ -99,15 +98,14 @@ def get_price_history():
     except KeyError:
         # Might occur at the start of a new hour when no trades have been recorded
         prices_this_hour = []
-    hour_set = _calculate_hour(previous_date_point, date_point, now, previous_price, prices_this_hour)
+    hour_set = _calculate_hour(date_point, now, previous_price, prices_this_hour)
     hour_history, previous_price = hour_set
     price_history.extend(hour_history)
     return price_history
 
-def _calculate_hour(previous_date_point, date_point, now, previous_price, prices):
+def _calculate_hour(date_point, now, previous_price, prices):
     """
     Calculates a list of plot points with applicable prices for one hour.
-    - previous_date_point: The datetime of the previous granularity
     - date_point: The datetime to begin calculations at; the start of an hour
     - now: The current datetime; passed as reference to avoid skew during code execution
     - previous_price: The applicable price *before* the current date_point start, may be None if unknown
@@ -118,6 +116,7 @@ def _calculate_hour(previous_date_point, date_point, now, previous_price, prices
     price_index = 0
     price_count = len(prices)
     hour_history = []
+    previous_date_point = date_point - timedelta(minutes=settings.CHART_GRANULARITY)
 
     # Iterate while we're within the hour, and while we're not in the future (latter case applies for the final hour
     # calculation)

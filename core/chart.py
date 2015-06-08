@@ -75,19 +75,19 @@ def get_price_history():
     while date_point < one_hour_ago:
         hour_set = cache.get('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
         if hour_set is None:
-            hour_set = _calculate_hour(previous_date_point, date_point, prices, previous_price, now)
+            hour_set = _calculate_hour(previous_date_point, date_point, now, previous_price, prices)
             cache.set('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
         hour_history, previous_price = hour_set
         price_history.extend(hour_history)
         date_point += timedelta(hours=1)
 
     # We're at the last hour; calculate that without caching it
-    hour_set = _calculate_hour(previous_date_point, date_point, prices, previous_price, now)
+    hour_set = _calculate_hour(previous_date_point, date_point, now, previous_price, prices)
     hour_history, previous_price = hour_set
     price_history.extend(hour_history)
     return price_history
 
-def _calculate_hour(previous_date_point, date_point, prices, previous_price, now):
+def _calculate_hour(previous_date_point, date_point, now, previous_price, prices):
     an_hour_from_datepoint = date_point + timedelta(hours=1)
 
     price_index = 0

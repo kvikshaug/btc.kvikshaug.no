@@ -75,6 +75,7 @@ def get_price_history():
     for group, price_group in groupby(prices, key=lambda p: p.datetime.strftime("%d.%H:00")):
         prices_by_hour[group] = list(price_group)
 
+    twentyfour_hours_ago = now - timedelta(hours=24)
     while date_point < one_hour_ago:
         hour_set = cache.get('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
         if hour_set is None:
@@ -90,7 +91,7 @@ def get_price_history():
         hour_history, previous_price = hour_set
 
         # Remove results older than 24h ago, now that they're cached
-        if date_point < now - timedelta(hours=24):
+        if date_point < twentyfour_hours_ago:
             hour_history_within_24h = []
             for h in hour_history:
                 _, minute = h[0].split(":")

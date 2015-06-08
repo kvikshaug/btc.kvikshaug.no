@@ -72,17 +72,34 @@ def get_price_history():
     if len(prices_before_chart_start) > 0:
         previous_price = prices_before_chart_start[-1]
 
+    # Finally group the prices by date and hour, so we can easily calculate plot points per hour
+    prices_by_hour = {}
+    for group, price_group in groupby(prices, key=lambda p: p.datetime.strftime("%d.%H:00")):
+        prices_by_hour[group] = list(price_group)
+
     while date_point < one_hour_ago:
         hour_set = cache.get('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))
         if hour_set is None:
-            hour_set = _calculate_hour(previous_date_point, date_point, now, previous_price, prices)
+            try:
+                prices_this_hour = prices_by_hour[date_point.strftime("%d.%H:00")]
+            except KeyError:
+                # Probably won't occur here unless
+                # a) there's a serious issue with the stock exchange, or
+                # b) our ticker has stopped for over an hour
+                prices_this_hour = []
+            hour_set = _calculate_hour(previous_date_point, date_point, now, previous_price, prices_this_hour)
             cache.set('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"), hour_set, 60 * 60 * 24)
         hour_history, previous_price = hour_set
         price_history.extend(hour_history)
         date_point += timedelta(hours=1)
 
     # We're at the last hour; calculate that without caching it
-    hour_set = _calculate_hour(previous_date_point, date_point, now, previous_price, prices)
+    try:
+        prices_this_hour = prices_by_hour[date_point.strftime("%d.%H:00")]
+    except KeyError:
+        # Might occur at the start of a new hour when no trades have been recorded
+        prices_this_hour = []
+    hour_set = _calculate_hour(previous_date_point, date_point, now, previous_price, prices_this_hour)
     hour_history, previous_price = hour_set
     price_history.extend(hour_history)
     return price_history

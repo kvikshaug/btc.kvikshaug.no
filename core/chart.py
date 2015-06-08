@@ -75,6 +75,10 @@ def get_price_history():
     for group, price_group in groupby(prices, key=lambda p: p.datetime.strftime("%d.%H:00")):
         prices_by_hour[group] = list(price_group)
 
+    # Now iterate each hour, calculate the prices for each of them and cache most of the results, except for the very
+    # last hour - we'll want to recalculate that with new trade data each request until a complete hour history has
+    # been recorded. After caching we'll remove prices older than 24h ago, so that the chart plots exactly 24h at any
+    # time.
     twentyfour_hours_ago = now - timedelta(hours=24)
     while date_point < one_hour_ago:
         hour_set = cache.get('price.history.result.by_hour.%s' % date_point.strftime("%d.%m.%Y.%H:%M"))

@@ -105,6 +105,14 @@ def get_price_history():
     return price_history
 
 def _calculate_hour(previous_date_point, date_point, now, previous_price, prices):
+    """
+    Calculates a list of plot points with applicable prices for one hour.
+    - previous_date_point: The datetime of the previous granularity
+    - date_point: The datetime to begin calculations at; the start of an hour
+    - now: The current datetime; passed as reference to avoid skew during code execution
+    - previous_price: The applicable price *before* the current date_point start, may be None if unknown
+    - prices: A list of trade prices for the applicable hour
+    """
     an_hour_from_datepoint = date_point + timedelta(hours=1)
 
     price_index = 0

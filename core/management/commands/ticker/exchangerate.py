@@ -1,5 +1,6 @@
 import decimal
 import logging
+import sys
 import threading
 
 import requests
@@ -31,6 +32,16 @@ class ExchangeRate(threading.Thread):
                 name, rate, date, time = csv.split(',')
                 self.rate = decimal.Decimal(rate)
                 self.stop_event.wait(ExchangeRate.SLEEP_TIME)
-            except Exception as e:
-                logger.warning("Unhandled exception: %s" % e)
-                logger.warning("Ignoring and trying to re-fetch exchange rate...")
+            except:
+                # Likely a problem with Yahoo's service; log a warning and retry
+                # Try to include the response text in the log data if it is available
+                try:
+                    extra = {'response': csv}
+                except NameError:
+                    extra = {}
+
+                logger.warning(
+                    "Couldn't look up USD/NOK exchange rate; ignoring and re-fetching instantly...",
+                    exc_info=sys.exc_info(),
+                    extra=extra,
+                )

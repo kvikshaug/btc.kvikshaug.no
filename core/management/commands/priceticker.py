@@ -2,6 +2,7 @@ import decimal
 import json
 import logging
 import signal
+import sys
 
 from django.core.management.base import BaseCommand
 
@@ -28,9 +29,11 @@ class Command(BaseCommand):
                 break
             except Restart:
                 logger.info("Received restart signal; shutting down and restarting...")
-            except Exception as e:
-                logger.error("Unexpected exception: %s" % e)
-                logger.info("Shutting down and restarting...")
+            except:
+                logger.error(
+                    "Unexpected exception in priceticker module; shutting down and restarting...",
+                    exc_info=sys.exc_info(),
+                )
             finally:
                 ticker.shutdown()
 

@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% load staticfiles %}
+
 {% block javascript %}
   <script>
     window.Kvikshaug.price_history = JSON.parse("{{ price_history|escapejs }}");
@@ -128,7 +130,7 @@
     <dd>Kursen følger til markedsprisen, med en liten kommisjon så jeg ikke går med tap. Hva som styrer markedsprisen til bitcoin <a href="https://bitcoin.org/en/you-need-to-know#volatile">er ikke like enkelt å si</a>.</dd>
 
     <dt>Hvordan vet jeg at jeg snakker med deg, og ikke noen som utgir seg for å være deg?</dt>
-    <dd>Jeg har registrert nicket <em>murr4y</em> på Freenode, <a href="https://freenode.net/faq.shtml#spoofing">sjekk at jeg er identifisert</a>. Hvis du vil være helt sikker, kan du be meg signere en melding med PGP-nøkkelen under.</dd>
+    <dd>Jeg har registrert nicket <em>murr4y</em> på Freenode, <a href="https://freenode.net/faq.shtml#spoofing">sjekk at jeg er identifisert</a>. Hvis du vil være helt sikker, kan du be meg signere en melding med min <a href="{% static "pgp/3624_317D_5BD2_01F8_E93D__9BD1_916A_7833_0030_199E.asc" %}">PGP-nøkkel</a>.</dd>
 
     <dt>Hvordan kan jeg stole på at du gjennomfører din del av handelen?</dt>
     <dd>Du må selv vurdere hvorvidt du føler at jeg er troverdig.</dd>
@@ -146,100 +148,7 @@
   <h2>Kontakt</h2>
 
   <p>
-    <strong>/q murr4y</strong> på <a href="https://freenode.net/">freenode</a> eller send epost til <a href="mailto:ali@kvikshaug.no">Ali Kaafarani &lt;ali@kvikshaug.no&gt;</a>. Krypter gjerne eposten med PGP-nøkkelen under. Jeg handler ikke bitcoins via epost.
+    <strong>/q murr4y</strong> på <a href="https://freenode.net/">freenode</a> eller send epost til <a href="mailto:ali@kvikshaug.no">Ali Kaafarani &lt;ali@kvikshaug.no&gt;</a> (<a href="{% static "pgp/3624_317D_5BD2_01F8_E93D__9BD1_916A_7833_0030_199E.asc" %}">PGP-nøkkel</a>). Jeg handler ikke bitcoins via epost.
   </p>
-
-  <hr>
-
-  <h2>
-    <a href="http://pgp.mit.edu:11371/pks/lookup?op=get&amp;search=0x916A78330030199E">PGP-nøkkel</a>
-  </h2>
-
-  <pre>-----BEGIN PGP PUBLIC KEY BLOCK-----
-Version: GnuPG v2
-
-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
-ZPZpZyQPBbobdH2YX7M=
-=EMrh
------END PGP PUBLIC KEY BLOCK-----</pre>
-
-<pre>-----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
-
-Key fingerprint = 3624 317D 5BD2 01F8 E93D  9BD1 916A 7833 0030 199E
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJVhDG6AAoJEJFqeDMAMBmeRkkP/ivOdVfbm32wCHEN1w0jWny8
-ZeEWX6lK1HPiUbvwBzh0OGL193Jao/484QL0WRUba7mvIrpzxgeRtIjYa1UIOSwk
-As6KaMkwnkSIsKSOJBozleNuWPRxZmMwAFDAVcmJBQeL8ZRl/XX1Fk2V+aZXMoLw
-S6DcrbiE/Wxdp38UqW3Fa2b1CkCAAc8XT9oc4WGqHWaxVi9N4h3f2PM6MxDPirzb
-+uXoqtnFy7BsER7bxxmxxYRktD8i2X8krtMB8y2xKd+QOFjsJbenti1GuyOJ4j/K
-6zp9inPg+9sgcuI7nOF6Gu0zcwsvggpVUsgYAIDcnkTIwNrcVHEK8xUVMJ9MuBzK
-68g9ehB2NArcvHtDpSe8jqDWMkxrkKkmBHlsRCyHd+nEgOCdmpggikTrEy9uQCcu
-4/lVjK/FaNeMTosMdh+8GQkwwzMBbKbwdbhgPlyI3iYqsaUkya+73oSj5bk3o9ds
-yTdwX+MFt2iShP9/ntZEry+SVKmIPRyStVA0Vsf0SRnggM4Tm9rJCj15+JH33gnF
-pJwOQtL65YyccZyDqfrnda9UpAAndAJFhboO3JzV+TZStAEkUvxRLwUVwUAhKlN4
-W0kEYdbqvVsY9tYjlSCS+NyjtxyA+N71RURHXUm5lzUbpwF1/GOmerJhTSPamtpe
-LGiV1ysthns+Vu3HHjh2
-=NTzk
------END PGP SIGNATURE-----</pre>
 
 {% endblock %}

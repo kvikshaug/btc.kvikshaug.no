@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from datetime import datetime
 import decimal
 import json
 import logging
@@ -6,17 +7,24 @@ import signal
 import sys
 
 import pusherclient
+import sqlalchemy
 
 from . import settings
 from .exceptions import Abort, Restart
 from .exchangerate import ExchangeRate
+from .models import Price
 
 logger = logging.getLogger(__name__)
+Session = sqlalchemy.orm.sessionmaker()
 
 class Ticker:
     BITSTAMP_APP_KEY = 'de504dc5763aeef9ff52'
 
     def __init__(self, *args, **kwargs):
+        # Init db engine
+        self.engine = sqlalchemy.create_engine(settings.DB_URL, echo=True)
+        Session.configure(bind=self.engine)
+
         # Add signal handlers
         signal.signal(signal.SIGTERM, self.handle_signal)
         signal.signal(signal.SIGHUP, self.handle_signal)
@@ -35,9 +43,12 @@ class Ticker:
         channel.bind('trade', self.handle_trade)
 
     def handle_trade(self, data):
+        session = Session()
         btcusd = json.loads(data, parse_float=decimal.Decimal)['price']
         usdnok = self.exchange_rate.get_rate()
-        # TODO: Save current price to database
+        price = Price(btcusd=btcusd, usdnok=usdnok, datetime=datetime.now())
+        session.add(price)
+        session.commit()
         logger.debug("Saved new trade price: %s (USDNOK: %s)" % (btcusd, usdnok))
 
     def shutdown(self):

@@ -1,6 +1,8 @@
 import logging.config
 import os
 
+DB_URL = "postgresql://postgres:@postgis/priceticker"
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

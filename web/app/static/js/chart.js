@@ -1,4 +1,4 @@
-$(function() {
+(function() {
   google.setOnLoadCallback(function() {
     var data = google.visualization.arrayToDataTable(window.Kvikshaug.price_history);
 
@@ -7,8 +7,8 @@ $(function() {
       legend: { position: 'bottom' }
     };
 
-    var chart = new google.visualization.LineChart($('.chart').get(0));
+    var chart = new google.visualization.LineChart(document.getElementsByClassName('chart')[0]);
 
     chart.draw(data, options);
   });
-});
+})();

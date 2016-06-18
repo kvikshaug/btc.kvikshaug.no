@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class ExchangeRate(threading.Thread):
     YAHOO_FINANCE_URL = "https://download.finance.yahoo.com/d/quotes.csv"
     YAHOO_FINANCE_PARAMS = {'e': '.csv', 'f': 'sl1d1t1', 's': 'USDNOK=X'}
-    SLEEP_TIME = 60 * 10
+    UPDATE_RATE = 60 * 10 # seconds
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,7 +31,7 @@ class ExchangeRate(threading.Thread):
                 csv = requests.get(ExchangeRate.YAHOO_FINANCE_URL, params=ExchangeRate.YAHOO_FINANCE_PARAMS).text
                 name, rate, date, time = csv.split(',')
                 self.rate = decimal.Decimal(rate)
-                self.stop_event.wait(ExchangeRate.SLEEP_TIME)
+                self.stop_event.wait(ExchangeRate.UPDATE_RATE)
             except:
                 # Likely a problem with Yahoo's service; log a warning and retry
                 # Try to include the response text in the log data if it is available

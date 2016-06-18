@@ -1,6 +1,19 @@
 version: '2'
 
 services:
+  web:
+    build: web/
+    image: kvikshaug/btc.kvikshaug.no-web
+    volumes:
+    - ./web:/home/user
+    ports:
+    - "5000:5000"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      CONFIGURATION: "dev"
+      FLASK_APP: "app/app.py"
+      FLASK_DEBUG: "1"
+
   priceticker:
     build: priceticker/
     image: kvikshaug/btc.kvikshaug.no-priceticker

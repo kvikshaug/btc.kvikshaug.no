@@ -1,0 +1,40 @@
+$bootstrap-gutter: 15px;
+
+.current-price {
+  .date-label {
+    text-align: center;
+  }
+
+  .buy, .sell {
+    .buy-label {
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    .price {
+      font-size: 26px;
+    }
+  }
+
+  $separator-padding: 30px;
+
+  .buy {
+    padding-right: $separator-padding;
+    border-right: 1px solid rgb(200, 200, 200);
+  }
+
+  .sell {
+    margin-left: $separator-padding - ($bootstrap-gutter * 2);
+  }
+}
+
+.faq {
+  dd {
+    margin-bottom: 15px;
+  }
+}
+
+footer {
+  margin-top: 20px;
+  padding-top: 80px;
+}

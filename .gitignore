@@ -1,12 +1,14 @@
-env/
 __pycache__/
+*.py[cod]
+*$py.class
+
 .sass-cache/
+web/app/static/css/
 
 .env
 *.sublime-project
 *.sublime-workspace
 
-btc/static/css/
 btc/conf/local.py
 db.sqlite3
 btc.log

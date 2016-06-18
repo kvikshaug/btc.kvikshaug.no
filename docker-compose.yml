@@ -5,7 +5,7 @@ services:
     build: web/
     image: kvikshaug/btc.kvikshaug.no-web
     volumes:
-    - ./web:/home/user
+    - ./web:/app
     ports:
     - "5000:5000"
     environment:
@@ -13,6 +13,13 @@ services:
       CONFIGURATION: "dev"
       FLASK_APP: "app/app.py"
       FLASK_DEBUG: "1"
+
+  builder:
+    build: web/app/static/
+    image: kvikshaug/btc.kvikshaug.no-web-builder
+    volumes:
+    - ./web/app/static:/static
+    command: sass --scss --watch scss:css
 
   priceticker:
     build: priceticker/

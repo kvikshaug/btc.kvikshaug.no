@@ -8,8 +8,8 @@ from flask import Flask, render_template
 
 from chart import get_price_history
 from database import db_session
-from models import Price
 import filters
+from models import Price
 
 locale.setlocale(locale.LC_ALL, "nb_NO.UTF-8")
 
@@ -25,10 +25,11 @@ def home():
     # Check the age of the last price. If it's too old, there might not have been any trades for a while, or more
     # likely; the priceticker has stopped.
     acceptable_age = timedelta(minutes=15)
-    if last_price.datetime + acceptable_age < datetime.now():
+    now = app.config['TIMEZONE'].fromutc(datetime.utcnow())
+    if app.config['TIMEZONE'].fromutc(last_price.datetime) + acceptable_age < now:
         logger.warning(
             "Last trade price is too old",
-            extra={'last_price': last_price, 'now': datetime.now()},
+            extra={'last_price': last_price, 'now': now},
         )
 
     context = {
@@ -37,7 +38,7 @@ def home():
             'sell': last_price.btcnok(rate=app.config['SELL_RATE']),
         },
         'price_history': json.dumps(get_price_history(app)),
-        'now': datetime.now(),
+        'now': now,
     }
     return render_template('home.html', **context)
 

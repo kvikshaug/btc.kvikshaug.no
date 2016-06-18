@@ -170,7 +170,7 @@ def _calculate_hour(app, date_point, now, previous_price, prices):
             sell_price = float(round(previous_price.btcnok(rate=app.config['SELL_RATE']), 2))
 
         hour_history.append([
-            date_point.strftime("%H:%M"),
+            app.config['TIMEZONE'].fromutc(date_point).strftime("%H:%M"),
             # timezone.localtime(date_point).strftime("%H:%M"),
             buy_price,
             sell_price,

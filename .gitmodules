@@ -1,3 +1,0 @@
-[submodule "private"]
-	path = btc/conf/private
-	url = ../private

@@ -8,8 +8,3 @@ web/app/static/css/
 .env
 *.sublime-project
 *.sublime-workspace
-
-btc/conf/local.py
-db.sqlite3
-btc.log
-btc.libraries.log

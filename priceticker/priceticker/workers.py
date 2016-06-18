@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import decimal
 import json
 import logging
@@ -6,6 +7,8 @@ import threading
 
 import pusherclient
 import requests
+
+from .models import Price
 
 logger = logging.getLogger(__name__)
 
@@ -72,3 +75,29 @@ class BTCUSDWorker:
     def stop(self):
         logger.debug("BTCUSDWorker: Disconnecting from Pusher")
         self.pusher.disconnect()
+
+class DBCleaner(threading.Thread):
+    """Purge old price history"""
+    HISTORY = timedelta(days=3)
+    CLEANING_RATE = 60 * 60 * 24 # seconds
+
+    def __init__(self, ticker, Session, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ticker = ticker
+        self.Session = Session
+        self.stop_event = threading.Event()
+        self.start()
+
+    def run(self):
+        while not self.stop_event.is_set():
+            session = self.Session()
+            date_limit = datetime.now() - DBCleaner.HISTORY
+            logger.debug("DBCleaner: Purging prices from before %s" % date_limit)
+            count = session.query(Price).filter(Price.datetime < date_limit).delete()
+            session.commit()
+            logger.debug("DBCleaner: Deleted %s price objects" % count)
+            self.stop_event.wait(DBCleaner.CLEANING_RATE)
+
+    def stop(self):
+        logger.debug("DBCleaner: Stopping")
+        self.stop_event.set()

@@ -8,7 +8,7 @@ import threading
 import sqlalchemy
 
 from . import settings
-from .workers import USDNOKWorker, BTCUSDWorker
+from .workers import USDNOKWorker, BTCUSDWorker, DBCleaner
 from .models import Price
 
 logging.config.dictConfig(settings.LOGGING)
@@ -30,6 +30,9 @@ class Ticker:
 
         logger.debug("Starting BTCUSD worker")
         self.btcusd_worker = BTCUSDWorker(self)
+
+        logger.debug("Starting DB cleaner")
+        self.db_cleaner = DBCleaner(self, Session)
 
     def set_usdnok(self, usdnok):
         with self.usdnok_lock:
@@ -54,6 +57,7 @@ class Ticker:
         logger.info("Received signal %s, stopping workers" % signum)
         self.usdnok_worker.stop()
         self.btcusd_worker.stop()
+        self.db_cleaner.stop()
 
 def main():
     ticker = Ticker()

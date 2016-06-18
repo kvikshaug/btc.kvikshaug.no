@@ -28,6 +28,17 @@ $bootstrap-gutter: 15px;
   }
 }
 
+.chart {
+  min-height: 200px;
+
+  .loading {
+    padding-top: 80px;
+    font-style: italic;
+    font-size: 20px;
+    text-align: center;
+  }
+}
+
 .faq {
   dd {
     margin-bottom: 15px;

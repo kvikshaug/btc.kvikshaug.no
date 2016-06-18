@@ -3,6 +3,7 @@ from datetime import datetime
 import decimal
 import json
 import logging
+import logging.config
 import signal
 import sys
 
@@ -14,6 +15,7 @@ from .exceptions import Abort, Restart
 from .exchangerate import ExchangeRate
 from .models import Price
 
+logging.config.dictConfig(settings.LOGGING)
 logger = logging.getLogger(__name__)
 Session = sqlalchemy.orm.sessionmaker()
 
@@ -32,13 +34,13 @@ class Ticker:
         # Initialize the exchange rate thread
         self.exchange_rate = ExchangeRate()
 
-        logger.info("Connecting to the BitStamp websocket...")
-        self.pusher = pusherclient.Pusher(Ticker.BITSTAMP_APP_KEY)
+        logger.info("Connecting to the BitStamp websocket")
+        self.pusher = pusherclient.Pusher(Ticker.BITSTAMP_APP_KEY, log_level=logging.WARNING)
         self.pusher.connection.bind('pusher:connection_established', self.subscribe)
         self.pusher.connect()
 
     def subscribe(self, data):
-        logger.info("Pusher connection established, subscribing to trades...")
+        logger.info("Pusher connection established, subscribing to trades")
         channel = self.pusher.subscribe('live_trades')
         channel.bind('trade', self.handle_trade)
 
@@ -52,7 +54,7 @@ class Ticker:
         logger.debug("Saved new trade price: %s (USDNOK: %s)" % (btcusd, usdnok))
 
     def shutdown(self):
-        logger.info("Closing sockets...")
+        logger.info("Closing sockets")
         self.pusher.disconnect()
         self.exchange_rate.stop()
 
@@ -70,14 +72,14 @@ def main():
         try:
             ticker = Ticker()
             ticker.pusher.connection.join()
-            logger.warning("Pusher connection exited unexpectedly; restarting...")
+            logger.warning("Pusher connection exited unexpectedly; restarting")
         except (KeyboardInterrupt, Abort):
-            logger.info("Received abort signal; shutting down...")
+            logger.info("Received abort signal; shutting down")
             break
         except Restart:
-            logger.info("Received restart signal; shutting down and restarting...")
+            logger.info("Received restart signal; shutting down and restarting")
         except:
-            logger.error("Unexpected exception; shutting down and restarting...", exc_info=sys.exc_info())
+            logger.error("Unexpected exception; shutting down and restarting", exc_info=sys.exc_info())
         finally:
             ticker.shutdown()
 

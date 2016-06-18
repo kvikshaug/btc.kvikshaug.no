@@ -1,4 +1,3 @@
-import logging.config
 import os
 
 DB_URL = "postgresql://postgres:@postgis/priceticker"
@@ -33,9 +32,7 @@ LOGGING = {
         },
     },
     'root': {
-        'level': 'DEBUG',
+        'level': 'INFO',
         'handlers': ['console', 'sentry'],
     }
 }
-
-logging.config.dictConfig(LOGGING)

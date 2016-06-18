@@ -5,7 +5,7 @@ import threading
 
 import requests
 
-logger = logging.getLogger('btc.priceticker.exchangerate')
+logger = logging.getLogger(__name__)
 
 class ExchangeRate(threading.Thread):
     YAHOO_FINANCE_URL = "https://download.finance.yahoo.com/d/quotes.csv"
@@ -27,7 +27,7 @@ class ExchangeRate(threading.Thread):
     def run(self):
         while not self.stop_event.is_set():
             try:
-                logger.debug("Fetching exchange rates from Yahoo Finance...")
+                logger.info("Fetching exchange rates from Yahoo Finance")
                 csv = requests.get(ExchangeRate.YAHOO_FINANCE_URL, params=ExchangeRate.YAHOO_FINANCE_PARAMS).text
                 name, rate, date, time = csv.split(',')
                 self.rate = decimal.Decimal(rate)
@@ -41,7 +41,7 @@ class ExchangeRate(threading.Thread):
                     extra = {}
 
                 logger.warning(
-                    "Couldn't look up USD/NOK exchange rate; ignoring and re-fetching instantly...",
+                    "Couldn't look up USD/NOK exchange rate; ignoring and re-fetching instantly",
                     exc_info=sys.exc_info(),
                     extra=extra,
                 )

@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  priceticker:
+    build: priceticker/
+    image: kvikshaug/btc.kvikshaug.no-priceticker
+    depends_on:
+    - postgis
+    volumes:
+    - ./priceticker:/app
+    environment:
+      PYTHONUNBUFFERED: "1"
+    env_file: priceticker/.env
+
+  postgis:
+    image: mdillon/postgis:latest
+    volumes:
+      - /var/lib/postgresql/data

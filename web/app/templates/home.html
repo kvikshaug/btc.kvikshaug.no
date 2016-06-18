@@ -15,7 +15,7 @@
 
   <div class="current-price">
     <p class="date-label">
-      Gjeldende kurs pr. {{ now.strftime("%-d. %B %Y %H:%M") }}
+      Gjeldende kurs pr. {{ now.strftime("%-d. %B %Y kl. %H:%M") }}
     </p>
 
     <div class="row">
@@ -26,7 +26,7 @@
             Kjøp
           </div>
           <div class="price">
-            kr. {{ price.buy|round(2) }}
+            kr. {{ current_price.buy|round(2) }}
           </div>
         </div>
 
@@ -38,7 +38,7 @@
             Salg
           </div>
           <div class="price">
-            kr. {{ price.sell|round(2) }}
+            kr. {{ current_price.sell|round(2) }}
           </div>
         </div>
 

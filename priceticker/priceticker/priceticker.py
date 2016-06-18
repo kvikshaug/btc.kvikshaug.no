@@ -1,18 +1,14 @@
 #!/usr/bin/python
 from datetime import datetime
-import decimal
-import json
 import logging
 import logging.config
 import signal
-import sys
+import threading
 
-import pusherclient
 import sqlalchemy
 
 from . import settings
-from .exceptions import Abort, Restart
-from .exchangerate import ExchangeRate
+from .workers import USDNOKWorker, BTCUSDWorker
 from .models import Price
 
 logging.config.dictConfig(settings.LOGGING)
@@ -20,68 +16,48 @@ logger = logging.getLogger(__name__)
 Session = sqlalchemy.orm.sessionmaker()
 
 class Ticker:
-    BITSTAMP_APP_KEY = 'de504dc5763aeef9ff52'
-
     def __init__(self, *args, **kwargs):
-        # Init db engine
-        self.engine = sqlalchemy.create_engine(settings.DB_URL, echo=True)
+        logger.debug("Creating database engine")
+        self.engine = sqlalchemy.create_engine(settings.DB_URL)
         Session.configure(bind=self.engine)
 
-        # Add signal handlers
-        signal.signal(signal.SIGTERM, self.handle_signal)
-        signal.signal(signal.SIGHUP, self.handle_signal)
+        logger.debug("Starting USDNOK worker")
+        self.usdnok_first = threading.Event()
+        self.usdnok_lock = threading.Lock()
+        self.usdnok_worker = USDNOKWorker(self)
+        logger.info("Waiting for first usdnok price")
+        self.usdnok_first.wait()
 
-        # Initialize the exchange rate thread
-        self.exchange_rate = ExchangeRate()
+        logger.debug("Starting BTCUSD worker")
+        self.btcusd_worker = BTCUSDWorker(self)
 
-        logger.info("Connecting to the BitStamp websocket")
-        self.pusher = pusherclient.Pusher(Ticker.BITSTAMP_APP_KEY, log_level=logging.WARNING)
-        self.pusher.connection.bind('pusher:connection_established', self.subscribe)
-        self.pusher.connect()
+    def set_usdnok(self, usdnok):
+        with self.usdnok_lock:
+            self.usdnok = usdnok
+            self.usdnok_first.set()
 
-    def subscribe(self, data):
-        logger.info("Pusher connection established, subscribing to trades")
-        channel = self.pusher.subscribe('live_trades')
-        channel.bind('trade', self.handle_trade)
-
-    def handle_trade(self, data):
+    def set_btcusd(self, btcusd):
+        with self.usdnok_lock:
+            usdnok = self.usdnok
         session = Session()
-        btcusd = json.loads(data, parse_float=decimal.Decimal)['price']
-        usdnok = self.exchange_rate.get_rate()
         price = Price(btcusd=btcusd, usdnok=usdnok, datetime=datetime.now())
         session.add(price)
         session.commit()
-        logger.debug("Saved new trade price: %s (USDNOK: %s)" % (btcusd, usdnok))
+        logger.info("Saved new trade price: %s" % price)
 
-    def shutdown(self):
-        logger.info("Closing sockets")
-        self.pusher.disconnect()
-        self.exchange_rate.stop()
+    def run_forever(self):
+        signal.signal(signal.SIGTERM, self.shutdown)
+        signal.signal(signal.SIGINT, self.shutdown)
+        signal.pause()
 
-    def handle_signal(self, signum, frame):
-        logger.debug("Handling signal %s" % signum)
-        if signum == signal.SIGTERM:
-            raise Abort("Received SIGTERM")
-        elif signum == signal.SIGHUP:
-            raise Restart("Received SIGHUP")
-        else:
-            raise Exception("Never asked to handle signal %s" % signum)
+    def shutdown(self, signum, frame):
+        logger.info("Received signal %s, stopping workers" % signum)
+        self.usdnok_worker.stop()
+        self.btcusd_worker.stop()
 
 def main():
-    while True:
-        try:
-            ticker = Ticker()
-            ticker.pusher.connection.join()
-            logger.warning("Pusher connection exited unexpectedly; restarting")
-        except (KeyboardInterrupt, Abort):
-            logger.info("Received abort signal; shutting down")
-            break
-        except Restart:
-            logger.info("Received restart signal; shutting down and restarting")
-        except:
-            logger.error("Unexpected exception; shutting down and restarting", exc_info=sys.exc_info())
-        finally:
-            ticker.shutdown()
+    ticker = Ticker()
+    ticker.run_forever()
 
 if __name__ == "__main__":
     main()

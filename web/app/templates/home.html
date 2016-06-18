@@ -18,33 +18,30 @@
       Gjeldende kurs pr. {{ now.strftime("%-d. %B %Y kl. %H:%M") }}
     </p>
 
-    <div class="row">
-      <div class="col-xs-6">
-
-        <div class="buy text-right">
-          <div class="buy-label">
-            Kjøp
-          </div>
-          <div class="price">
-            kr. {{ current_price.buy|round(2) }}
-          </div>
+    <div class="buy-wrapper">
+      <div class="buy">
+        <div class="buy-label">
+          Kjøp
         </div>
-
+        <div class="price">
+          kr. {{ current_price.buy|round(2) }}
+        </div>
       </div>
-      <div class="col-xs-6">
+    </div>
 
-        <div class="sell">
-          <div class="buy-label">
-            Salg
-          </div>
-          <div class="price">
-            kr. {{ current_price.sell|round(2) }}
-          </div>
+    <div class="sell-wrapper">
+      <div class="sell">
+        <div class="buy-label">
+          Salg
         </div>
-
+        <div class="price">
+          kr. {{ current_price.sell|round(2) }}
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="clear"></div>
 
   <div class="chart">
     <p class="loading">
@@ -54,35 +51,13 @@
 
   <hr>
 
-  <div class="table-responsive">
-    <table class="table">
-      <thead>
-        <tr>
-          <th colspan="2">Avtal handel</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th>SMS</th>
-          <td>
-            Send meg SMS på tlf. <a href="tel:+4747067156">470 67 156</a>
-          </td>
-        </tr>
-        <tr>
-          <th>Epost</th>
-          <td>
-            <a href="mailto:ali@kvikshaug.no">Ali Kaafarani &lt;ali@kvikshaug.no&gt;</a> (<a href="/static/pgp/3624_317D_5BD2_01F8_E93D__9BD1_916A_7833_0030_199E.asc">PGP-nøkkel</a>)
-          </td>
-        </tr>
-        <tr>
-          <th>IRC</th>
-          <td>
-            <strong>/q murr4y</strong> på <a href="https://freenode.net/">freenode</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <h2>Avtal handel</h2>
+
+  <p>
+    <strong>SMS:</strong> Send meg SMS på tlf. <a href="tel:+4747067156">470 67 156</a><br>
+    <strong>Epost:</strong> <a href="mailto:ali@kvikshaug.no">Ali Kaafarani &lt;ali@kvikshaug.no&gt;</a> (<a href="/static/pgp/3624_317D_5BD2_01F8_E93D__9BD1_916A_7833_0030_199E.asc">PGP-nøkkel</a>)<br>
+    <strong>IRC:</strong> <strong>/q murr4y</strong> på <a href="https://freenode.net/">freenode</a>
+  </p>
 
   <hr>
 
@@ -93,15 +68,17 @@
   </p>
 
   <p>
-    Når du tar kontakt avtaler vi handel til gjeldende kurs. Så sender du <strong>nøyaktig avtalt beløp</strong> av kroner eller bitcoins til kontoen/adressen du får, og når overføringen er registrert sender jeg tilbake avtalt beløp.
+    Når du tar kontakt avtaler vi handel til gjeldende kurs. Så sender du nøyaktig avtalt beløp i kroner eller bitcoins til kontoen/adressen du får, og når overføringen er registrert sender jeg tilbake avtalt beløp.
   </p>
 
   <p>
-    <strong>Vipps</strong>: Jeg kan overføre/ta imot kroner med Vipps; legg til <strong>Ali Kaafarani</strong>, tlf. <strong><a href="tel:+4747067156">470 67 156</a></strong>. For <a href="https://www.vipps.no/#pris">beløp over 5000 kr</a> må du selv dekke Vipps' gebyrer.
+    <strong>Vipps:</strong><br>
+    Jeg kan overføre/ta imot kroner med Vipps; legg til Ali Kaafarani, tlf. <strong><a href="tel:+4747067156">470 67 156</a></strong>. For <a href="https://www.vipps.no/#pris">beløp over 5000 kr</a> må du selv dekke Vipps' gebyrer.
   </p>
 
   <p>
-    <strong>Bankoverførsel</strong>: Be om eller oppgi kontonummer når vi avtaler handel. Vanlig bankoverførsel kan ta tid, dersom vi ikke har samme bank (jeg har Sparebanken Sør). Hvis vi avtaler handel fredag ettermiddag, er det ikke sikkert jeg kan sende deg bitcoins før mandag morgen.
+    <strong>Bankoverførsel:</strong><br>
+    Be om eller oppgi kontonummer når vi avtaler handel. Vanlig bankoverførsel kan ta tid, dersom vi ikke har samme bank (jeg har Sparebanken Sør). Hvis vi avtaler handel fredag ettermiddag, er det ikke sikkert jeg kan sende deg bitcoins før mandag morgen.
   </p>
 
   <p>

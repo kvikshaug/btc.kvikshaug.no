@@ -1,0 +1,75 @@
+kind: ReplicationController
+apiVersion: v1
+metadata:
+  name: btc-kvikshaug-no
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: btc-kvikshaug-no
+        tier: backend
+        version: v1
+    spec:
+      containers:
+      - name: static
+        image: eu.gcr.io/monkey-island-1227/nginx-django:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: static
+          mountPath: /mnt/static/build
+          readOnly: true
+        resources:
+          limits:
+            cpu: "1m"
+      - name: web
+        image: eu.gcr.io/monkey-island-1227/btc.kvikshaug.no-web:latest
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: static
+          mountPath: /mnt/static
+        - name: secrets-web
+          mountPath: /mnt/secrets
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: FLASK_APP
+          value: "app/app.py"
+        - name: CONFIGURATION
+          value: "prod"
+        command:
+        - "/app/init.sh"
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - "cp"
+              - "-a"
+              - "/app/app/static/"
+              - "/mnt/"
+        resources:
+          limits:
+            cpu: "5m"
+      - name: priceticker
+        image: eu.gcr.io/monkey-island-1227/btc.kvikshaug.no-priceticker:latest
+        volumeMounts:
+        - name: secrets-priceticker
+          mountPath: /mnt/secrets
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        command:
+        - "/app/init.sh"
+        resources:
+          limits:
+            cpu: "1m"
+      volumes:
+      - name: static
+      - name: secrets-web
+        secret:
+          secretName: btc-kvikshaug-no
+      - name: secrets-priceticker
+        secret:
+          secretName: priceticker

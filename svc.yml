@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: btc-kvikshaug-no
+  labels:
+    app: btc-kvikshaug-no
+    tier: backend
+spec:
+  selector:
+    app: btc-kvikshaug-no
+  ports:
+  - port: 80
+    name: web

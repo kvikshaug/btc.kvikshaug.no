@@ -21,23 +21,29 @@ app.register_blueprint(filters.blueprint)
 
 @app.route('/')
 def home():
-    last_price = db_session.query(Price).order_by(Price.datetime.desc())[0]
-
-    # Check the age of the last price. If it's too old, there might not have been any trades for a while, or more
-    # likely; the priceticker has stopped.
-    acceptable_age = timedelta(minutes=15)
     now = app.config['TIMEZONE'].fromutc(datetime.utcnow())
-    if app.config['TIMEZONE'].fromutc(last_price.datetime) + acceptable_age < now:
-        logger.warning(
-            "Last trade price is too old",
-            extra={'last_price': last_price, 'now': now},
-        )
 
-    context = {
-        'current_price': {
+    try:
+        last_price = db_session.query(Price).order_by(Price.datetime.desc())[0]
+
+        # Check the age of the last price. If it's too old, there might not have been any trades for a while, or more
+        # likely; the priceticker has stopped.
+        acceptable_age = timedelta(minutes=15)
+        if app.config['TIMEZONE'].fromutc(last_price.datetime) + acceptable_age < now:
+            logger.warning(
+                "Last trade price is too old",
+                extra={'last_price': last_price, 'now': now},
+            )
+
+        current_price = {
             'buy': last_price.btcnok(rate=app.config['BUY_RATE']),
             'sell': last_price.btcnok(rate=app.config['SELL_RATE']),
-        },
+        }
+    except IndexError:
+        current_price = None
+
+    context = {
+        'current_price': current_price,
         'price_history': json.dumps(get_price_history(app)),
         'now': now,
     }

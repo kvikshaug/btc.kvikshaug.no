@@ -3,6 +3,7 @@ IMAGE = kvikshaug/${NAME}
 IMAGE_GCR = eu.gcr.io/monkey-island-1227/${NAME}
 
 default: build
+qa: test
 
 .PHONY: build
 build:
@@ -14,3 +15,7 @@ build:
 .PHONY: push
 push:
 	gcloud docker push ${IMAGE_GCR}
+
+.PHONY: test
+test:
+	docker-compose run --rm web python app/tests.py

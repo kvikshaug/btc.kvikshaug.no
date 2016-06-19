@@ -7,6 +7,7 @@ import json
 from flask import Flask, render_template
 
 from chart import get_price_history
+import conf
 from database import db_session
 import filters
 from models import Price
@@ -15,7 +16,7 @@ locale.setlocale(locale.LC_ALL, "nb_NO.UTF-8")
 
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
-app.config.from_object('conf.%s' % os.environ['CONFIGURATION'])
+app.config.update(conf.settings)
 app.register_blueprint(filters.blueprint)
 
 @app.route('/')

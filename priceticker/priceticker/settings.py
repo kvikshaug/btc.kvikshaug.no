@@ -1,6 +1,6 @@
 import os
 
-DB_URL = "postgresql://postgres:@postgis/priceticker"
+DB_URL = "postgresql://postgres:@postgres/priceticker"
 
 LOGGING = {
     'version': 1,

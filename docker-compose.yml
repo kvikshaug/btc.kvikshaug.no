@@ -4,6 +4,8 @@ services:
   web:
     build: web/
     image: kvikshaug/btc.kvikshaug.no-web
+    depends_on:
+    - postgres
     volumes:
     - ./web:/app
     ports:
@@ -25,14 +27,14 @@ services:
     build: priceticker/
     image: kvikshaug/btc.kvikshaug.no-priceticker
     depends_on:
-    - postgis
+    - postgres
     volumes:
     - ./priceticker:/app
     environment:
       PYTHONUNBUFFERED: "1"
     env_file: priceticker/.env
 
-  postgis:
-    image: mdillon/postgis:latest
+  postgres:
+    image: postgres:latest
     volumes:
       - /var/lib/postgresql/data

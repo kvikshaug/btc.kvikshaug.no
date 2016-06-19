@@ -3,7 +3,7 @@ import sqlalchemy.orm
 
 from conf import settings
 
-engine = sqlalchemy.create_engine(settings.DB_URL)
+engine = sqlalchemy.create_engine(settings['DB_URL'])
 
 db_session = sqlalchemy.orm.scoped_session(
     sqlalchemy.orm.sessionmaker(

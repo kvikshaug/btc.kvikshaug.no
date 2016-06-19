@@ -95,6 +95,7 @@ class DBCleaner(threading.Thread):
             logger.debug("DBCleaner: Purging prices from before %s" % date_limit)
             count = session.query(Price).filter(Price.datetime < date_limit).delete()
             session.commit()
+            session.close()
             logger.debug("DBCleaner: Deleted %s price objects" % count)
             self.stop_event.wait(DBCleaner.CLEANING_RATE)
 

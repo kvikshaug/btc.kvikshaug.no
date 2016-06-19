@@ -47,6 +47,7 @@ class Ticker:
         session.add(price)
         session.commit()
         logger.info("Saved new trade price: %s" % price)
+        session.close()
 
     def run_forever(self):
         signal.signal(signal.SIGTERM, self.shutdown)

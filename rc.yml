@@ -60,6 +60,8 @@ spec:
         env:
         - name: PYTHONUNBUFFERED
           value: "1"
+        - name: CONFIGURATION
+          value: "prod"
         command:
         - "/app/init.sh"
         resources:

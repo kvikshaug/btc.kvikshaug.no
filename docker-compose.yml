@@ -32,6 +32,7 @@ services:
     - ./priceticker:/app
     environment:
       PYTHONUNBUFFERED: "1"
+      CONFIGURATION: "dev"
     env_file: priceticker/.env
 
   postgres:

@@ -1,6 +1,9 @@
 import os
 
-DB_URL = "postgresql://postgres:@postgres/priceticker"
+if os.environ['CONFIGURATION'] == 'dev':
+    DB_URL = "postgresql://postgres:@postgres/priceticker"
+elif os.environ['CONFIGURATION'] == 'prod':
+    DB_URL = "postgresql://postgres:@postgis/priceticker"
 
 LOGGING = {
     'version': 1,

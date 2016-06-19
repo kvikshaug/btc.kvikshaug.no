@@ -13,12 +13,12 @@ spec:
     spec:
       containers:
       - name: static
-        image: eu.gcr.io/monkey-island-1227/nginx-django:latest
+        image: eu.gcr.io/monkey-island-1227/nginx:latest
         ports:
         - containerPort: 80
         volumeMounts:
         - name: static
-          mountPath: /mnt/static/build
+          mountPath: /mnt/static
           readOnly: true
         resources:
           limits:
@@ -47,8 +47,9 @@ spec:
               command:
               - "cp"
               - "-a"
+              - "-T"
               - "/app/app/static/"
-              - "/mnt/"
+              - "/mnt/static/"
         resources:
           limits:
             cpu: "5m"

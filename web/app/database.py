@@ -1,7 +1,9 @@
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
-engine = sqlalchemy.create_engine("postgresql://postgres:@postgis/priceticker")
+from conf import settings
+
+engine = sqlalchemy.create_engine(settings.DB_URL)
 
 db_session = sqlalchemy.orm.scoped_session(
     sqlalchemy.orm.sessionmaker(

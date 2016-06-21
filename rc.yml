@@ -22,7 +22,7 @@ spec:
           readOnly: true
         resources:
           limits:
-            cpu: "1m"
+            cpu: "5m"
       - name: web
         image: eu.gcr.io/monkey-island-1227/btc.kvikshaug.no-web:latest
         ports:

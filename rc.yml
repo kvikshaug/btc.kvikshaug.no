@@ -12,7 +12,7 @@ spec:
         version: v1
     spec:
       containers:
-      - name: static
+      - name: nginx
         image: eu.gcr.io/monkey-island-1227/nginx:latest
         ports:
         - containerPort: 80

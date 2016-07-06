@@ -7,7 +7,7 @@ import json
 from flask import Flask, render_template
 
 from chart import get_price_history
-import conf
+from conf import settings
 from database import db_session
 import filters
 from models import Price
@@ -16,30 +16,19 @@ locale.setlocale(locale.LC_ALL, "nb_NO.UTF-8")
 
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
-app.config.update(conf.settings)
+app.config.update(settings)
 app.register_blueprint(filters.blueprint)
 
 @app.route('/')
 def home():
-    now = app.config['TIMEZONE'].fromutc(datetime.utcnow())
-
-    try:
-        last_price = db_session.query(Price).order_by(Price.datetime.desc())[0]
-
-        # Check the age of the last price. If it's too old, there might not have been any trades for a while, or more
-        # likely; the priceticker has stopped.
-        acceptable_age = timedelta(minutes=15)
-        if app.config['TIMEZONE'].fromutc(last_price.datetime) + acceptable_age < now:
-            logger.warning(
-                "Last trade price is too old",
-                extra={'last_price': last_price, 'now': now},
-            )
-
+    now = settings['TIMEZONE'].fromutc(datetime.utcnow())
+    last_price = Price.last()
+    if last_price is not None:
         current_price = {
-            'buy': last_price.btcnok(rate=app.config['BUY_RATE']),
-            'sell': last_price.btcnok(rate=app.config['SELL_RATE']),
+            'buy': last_price.btcnok(rate=settings['BUY_RATE']),
+            'sell': last_price.btcnok(rate=settings['SELL_RATE']),
         }
-    except IndexError:
+    else:
         current_price = None
 
     context = {

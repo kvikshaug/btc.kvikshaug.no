@@ -15,6 +15,8 @@ services:
       CONFIGURATION: "dev"
       FLASK_APP: "app/app.py"
       FLASK_DEBUG: "1"
+      BUY_RATE: "0.99"
+      SELL_RATE: "1.02"
 
   builder:
     build: web/app/static/

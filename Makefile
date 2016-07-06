@@ -23,6 +23,11 @@ push:
 	gcloud docker push ${IMAGE_GCR_PRICETICKER}
 	gcloud docker push ${IMAGE_GCR_WEB}
 
+.PHONY: deploy
+deploy:
+	kubectl delete -f rc.yml
+	kubectl create -f rc.yml
+
 .PHONY: test
 test:
 	docker-compose run --rm web python app/tests.py

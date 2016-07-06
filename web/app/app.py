@@ -4,7 +4,7 @@ import logging
 import os
 import json
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, abort
 
 from chart import get_price_history
 from conf import settings
@@ -37,6 +37,17 @@ def home():
         'now': now,
     }
     return render_template('home.html', **context)
+
+@app.route('/ticker')
+def ticker():
+    last_price = Price.last()
+    if last_price is not None:
+        return jsonify(btcnok={
+            'buy': str(round(last_price.btcnok(rate=settings['BUY_RATE']), 2)),
+            'sell': str(round(last_price.btcnok(rate=settings['SELL_RATE']), 2)),
+        })
+    else:
+        abort(503)
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):

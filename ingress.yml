@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: btc-kvikshaug-no
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - btc.kvikshaug.no
+    secretName: btc-kvikshaug-no-tls
+  rules:
+  - host: btc.kvikshaug.no
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: btc-kvikshaug-no
+          servicePort: 80
